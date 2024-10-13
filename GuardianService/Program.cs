@@ -65,7 +65,7 @@ builder.Services.AddCors(options =>
     });*/
     options.AddPolicy("AllowSpecificOrigins", policy =>
     {
-        policy.WithOrigins("https://localhost", "https://guardian-service.onrender.com")  // Permitir estos dominios
+        policy.WithOrigins("http://localhost","https://localhost", "https://guardian-service.onrender.com")  // Permitir estos dominios
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
