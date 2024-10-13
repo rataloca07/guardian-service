@@ -419,13 +419,46 @@ namespace GuardianService.Services
             return R * c;
         }
 
-        public async Task ActualizarTokenDispositivo(string guardianId, string token)
+        /*public async Task ActualizarTokenDispositivo(string guardianId, string token)
         {
             DocumentReference docRef = _firestoreDb.Collection("Guardianes").Document(guardianId);
             await docRef.UpdateAsync(new Dictionary<string, object>
             {
                 { "TokenDispositivo", token }
             });
+        }*/
+
+        public async Task ActualizarTokenDispositivo(string guardianId, string nuevoToken)
+        {
+            try
+            {
+                // Busca el guardián en la base de datos
+                var guardianDoc = await _firestoreDb.Collection("Guardianes").Document(guardianId).GetSnapshotAsync();
+
+                if (guardianDoc.Exists)
+                {
+                    var tokenDispositivoActual = guardianDoc.GetValue<string>("TokenDispositivo");
+
+                    // Actualizamos el token, incluso si ya existía uno
+                    if (!string.IsNullOrEmpty(tokenDispositivoActual))
+                    {
+                        Console.WriteLine($"Token anterior: {tokenDispositivoActual}. Se actualizará al nuevo token: {nuevoToken}");
+                    }
+
+                    // Actualizamos el token en Firebase
+                    await guardianDoc.Reference.UpdateAsync("TokenDispositivo", nuevoToken);
+                    Console.WriteLine("Token de dispositivo actualizado correctamente en la base de datos");
+                }
+                else
+                {
+                    Console.WriteLine($"Guardían con ID {guardianId} no encontrado.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error actualizando token de dispositivo: {ex.Message}");
+                throw;
+            }
         }
 
         public async Task EliminarTokenDispositivo(string guardianId)
