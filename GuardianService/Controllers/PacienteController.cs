@@ -45,6 +45,7 @@ namespace GuardianService.Controllers
             // Si está fuera de la zona segura, enviamos la notificación al guardián
             if (estaFueraDeZonaSegura)
             {
+                Console.WriteLine("---------------Paciente salio de zona segura----------------");
                 var guardian = await _firestoreService.ObtenerGuardianPorId(paciente.GuardianId);
                 if (guardian != null && !string.IsNullOrEmpty(guardian.TokenDispositivo))
                 {
@@ -55,6 +56,10 @@ namespace GuardianService.Controllers
                 }
 
                 return Ok(new { message = "Paciente fuera de la zona segura, alerta enviada" });
+            }
+            else
+            {
+                Console.WriteLine("---------------Paciente sigue dentro de zona segura----------------");
             }
 
             return Ok(new { message = "Paciente dentro de la zona segura, sin alerta." });

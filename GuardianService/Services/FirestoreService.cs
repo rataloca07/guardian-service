@@ -284,7 +284,7 @@ namespace GuardianService.Services
             }
         }*/
 
-        public async Task EnviarNotificacionAlerta(string tokenDispositivo, string titulo, string mensaje)
+        /*public async Task EnviarNotificacionAlerta(string tokenDispositivo, string titulo, string mensaje)
         {
             // Cargar credenciales desde el archivo de cuenta de servicio o variable de entorno
             GoogleCredential credential;
@@ -292,6 +292,7 @@ namespace GuardianService.Services
 
             if (!string.IsNullOrEmpty(credentialJson))
             {
+                Console.WriteLine("credentialJson: " + credentialJson);
                 credential = GoogleCredential.FromJson(credentialJson)
                     .CreateScoped("https://www.googleapis.com/auth/firebase.messaging");
             }
@@ -335,6 +336,61 @@ namespace GuardianService.Services
                 var error = await response.Content.ReadAsStringAsync();
                 throw new Exception($"Error enviando notificación: {error}");
             }
+        }*/
+        public async Task EnviarNotificacionAlerta(string tokenDispositivo, string titulo, string mensaje)
+        {
+            Console.WriteLine("Entró a EnviarNotificacionAlerta");
+            Console.WriteLine("tokenDispositivo: "+JsonConvert.SerializeObject(tokenDispositivo));
+            Console.WriteLine("titulo: " + JsonConvert.SerializeObject(titulo));
+            Console.WriteLine("mensaje: " + JsonConvert.SerializeObject(mensaje));
+            GoogleCredential credential;
+            var credentialJson = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIAL");
+
+            if (!string.IsNullOrEmpty(credentialJson))
+            {
+                credential = GoogleCredential.FromJson(credentialJson)
+                    .CreateScoped("https://www.googleapis.com/auth/firebase.messaging");
+            }
+            else
+            {
+                throw new Exception("No se encontraron credenciales válidas para Firebase.");
+            }
+
+            var accessToken = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
+
+            var message = new
+            {
+                message = new
+                {
+                    token = tokenDispositivo,
+                    notification = new
+                    {
+                        title = titulo,
+                        body = mensaje
+                    }
+                }
+            };
+
+            var jsonMessage = JsonConvert.SerializeObject(message);
+
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {accessToken}");
+
+            var content = new StringContent(jsonMessage, Encoding.UTF8, "application/json");
+
+            // Agrega un log para saber que se está intentando enviar la solicitud
+            Console.WriteLine("Enviando notificación a FCM con el mensaje: " + jsonMessage);
+
+            var response = await client.PostAsync("https://fcm.googleapis.com/v1/projects/guardian-b6940/messages:send", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error enviando notificación: {error}");
+            }
+
+            // Log para confirmar que la notificación fue enviada con éxito
+            Console.WriteLine("Notificación enviada exitosamente.");
         }
 
         // Obtener las zonas seguras de un paciente
