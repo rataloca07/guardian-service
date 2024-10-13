@@ -86,10 +86,10 @@ namespace GuardianService.Services
 
 
         // Registrar un paciente
-        public async Task RegistrarPaciente(Paciente paciente)
+        /*public async Task RegistrarPaciente(Paciente paciente)
         {
-            /*DocumentReference docRef = _firestoreDb.Collection("Pacientes").Document(paciente.Id);
-            await docRef.SetAsync(paciente);*/
+            //DocumentReference docRef = _firestoreDb.Collection("Pacientes").Document(paciente.Id);
+            //await docRef.SetAsync(paciente);
             if (string.IsNullOrEmpty(paciente.Id))
             {
                 DocumentReference docRef = _firestoreDb.Collection("Pacientes").Document();
@@ -101,6 +101,27 @@ namespace GuardianService.Services
                 DocumentReference docRef = _firestoreDb.Collection("Pacientes").Document(paciente.Id);
                 await docRef.SetAsync(paciente);
             }
+        }*/
+
+
+        public async Task<Paciente> RegistrarPaciente(Paciente paciente)
+        {
+            if (string.IsNullOrEmpty(paciente.Id))
+            {
+                // Generar un nuevo ID si no se proporciona uno
+                DocumentReference docRef = _firestoreDb.Collection("Pacientes").Document();
+                paciente.Id = docRef.Id;  // Asignar el ID generado al paciente
+                await docRef.SetAsync(paciente);
+            }
+            else
+            {
+                // Si ya tiene un ID, usarlo directamente
+                DocumentReference docRef = _firestoreDb.Collection("Pacientes").Document(paciente.Id);
+                await docRef.SetAsync(paciente);
+            }
+
+            // Retornar el paciente con el ID asignado
+            return paciente;
         }
 
         // Actualizar la ubicación y el ritmo cardíaco del paciente desde el dispositivo IoT
@@ -386,7 +407,7 @@ namespace GuardianService.Services
         public async Task EnviarNotificacionAlerta(string tokenDispositivo, string titulo, string mensaje)
         {
             Console.WriteLine("Entró a EnviarNotificacionAlerta");
-            Console.WriteLine("tokenDispositivo: "+JsonConvert.SerializeObject(tokenDispositivo));
+            Console.WriteLine("tokenDispositivo: " + JsonConvert.SerializeObject(tokenDispositivo));
             Console.WriteLine("titulo: " + JsonConvert.SerializeObject(titulo));
             Console.WriteLine("mensaje: " + JsonConvert.SerializeObject(mensaje));
             GoogleCredential credential;

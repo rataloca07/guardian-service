@@ -20,7 +20,7 @@ namespace GuardianService.Controllers
         }
 
         // Registrar un paciente
-        [HttpPost("registrar")]
+        /*[HttpPost("registrar")]
         public async Task<IActionResult> RegistrarPaciente([FromBody] Paciente paciente)
         {
             if (paciente == null)
@@ -45,6 +45,36 @@ namespace GuardianService.Controllers
 
             await _firestoreService.RegistrarPaciente(paciente);
             return Ok(new { message = "Paciente registrado correctamente" });
+        }*/
+
+        [HttpPost("registrar")]
+        public async Task<IActionResult> RegistrarPaciente([FromBody] Paciente paciente)
+        {
+            if (paciente == null)
+            {
+                return BadRequest(new { message = "Datos del paciente vacíos" });
+            }
+
+            if (string.IsNullOrEmpty(paciente.Nombre))
+            {
+                return BadRequest(new { message = "Nombre obligatorio" });
+            }
+
+            if (string.IsNullOrEmpty(paciente.SIM))
+            {
+                return BadRequest(new { message = "Sim obligatoria" });
+            }
+
+            if (string.IsNullOrEmpty(paciente.GuardianId))
+            {
+                return BadRequest(new { message = "No tiene guardián asociado" });
+            }
+
+            // Llamamos al servicio para registrar el paciente y obtenemos el paciente registrado con su ID
+            var pacienteRegistrado = await _firestoreService.RegistrarPaciente(paciente);
+
+            // Retornar el ID del paciente registrado para que el frontend lo maneje adecuadamente
+            return Ok(new { PacienteId = pacienteRegistrado.Id, message = "Paciente registrado correctamente" });
         }
 
         // Actualizar ubicación y ritmo cardíaco desde el dispositivo IoT
