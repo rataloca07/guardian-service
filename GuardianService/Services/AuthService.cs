@@ -30,6 +30,10 @@ namespace GuardianService.Services
             {
                 throw new ArgumentException("La clave JWT no está configurada correctamente.");
             }
+            else
+            {
+                Console.WriteLine($"JWT Key: {key}");
+            }
 
             var keyBytes = Encoding.UTF8.GetBytes(key);
 

@@ -6,6 +6,9 @@ using GuardianService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Asegúrate de agregar esta línea para cargar las variables de entorno
+builder.Configuration.AddEnvironmentVariables();
+
 // Add services to the container.
 
 builder.Services.AddControllers();
