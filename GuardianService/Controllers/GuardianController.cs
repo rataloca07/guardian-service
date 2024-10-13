@@ -24,6 +24,11 @@ namespace GuardianService.Controllers
         [HttpPost("registrar")]
         public async Task<IActionResult> RegistrarGuardian([FromBody] Guardian guardian)
         {
+            if (guardian == null || string.IsNullOrEmpty(guardian.Email) || string.IsNullOrEmpty(guardian.Password) || string.IsNullOrEmpty(guardian.Nombre))
+            {
+                return BadRequest(new { message = "Todos los campos son obligatorios." });
+            }
+
             // Cifrar la contraseña antes de guardar
             guardian.Password = BCrypt.Net.BCrypt.HashPassword(guardian.Password);
             await _firestoreService.RegistrarGuardian(guardian);

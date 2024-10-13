@@ -39,11 +39,23 @@ namespace GuardianService.Services
             _firestoreDb = FirestoreDb.Create(Environment.GetEnvironmentVariable("FIREBASE_PROJECT_ID"), firestoreClient);
         }
 
+
         // Registrar un nuevo guardián
         public async Task RegistrarGuardian(Guardian guardian)
         {
-            DocumentReference docRef = _firestoreDb.Collection("Guardianes").Document(guardian.Id);
-            await docRef.SetAsync(guardian);
+            /*DocumentReference docRef = _firestoreDb.Collection("Guardianes").Document(guardian.Id);
+            await docRef.SetAsync(guardian);*/
+            if (string.IsNullOrEmpty(guardian.Id))
+            {
+                DocumentReference docRef = _firestoreDb.Collection("Guardianes").Document();
+                guardian.Id = docRef.Id; // Asigna el Id generado a la zonaSegura
+                await docRef.SetAsync(guardian);
+            }
+            else
+            {
+                DocumentReference docRef = _firestoreDb.Collection("Guardianes").Document(guardian.Id);
+                await docRef.SetAsync(guardian);
+            }
         }
 
         // Obtener un guardián por su correo electrónico
