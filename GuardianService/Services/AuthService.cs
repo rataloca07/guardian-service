@@ -23,7 +23,18 @@ namespace GuardianService.Services
         public string GenerateToken(string guardianId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Convert.FromBase64String(_configuration["Jwt:Key"]);  // Cambiado aquí
+
+            // Obtener el valor de la clave desde la configuración
+            var keyString = _configuration["Jwt:Key"];
+
+            // Imprimir el valor de la clave obtenida de la configuración
+            Console.WriteLine("Valor de Jwt:Key obtenido: " + keyString);
+
+            // Si tienes algún servicio de logging, podrías usarlo en lugar de Console.WriteLine
+            // _logger.LogInformation("Valor de Jwt:Key obtenido: " + keyString);
+
+            // Convertir la clave de Base64 a un arreglo de bytes
+            var key = Convert.FromBase64String(keyString);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
