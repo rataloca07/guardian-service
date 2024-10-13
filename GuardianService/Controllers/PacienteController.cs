@@ -38,7 +38,7 @@ namespace GuardianService.Controllers
                 return BadRequest(new { message = "Sim obligatoria" });
             }
 
-            if (string.IsNullOrEmpty(paciente.Id))
+            if (string.IsNullOrEmpty(paciente.GuardianId))
             {
                 return BadRequest(new { message = "No tiene guardián asociado" });
             }
