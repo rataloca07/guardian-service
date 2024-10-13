@@ -58,6 +58,14 @@ namespace GuardianService.Controllers
             await _firestoreService.ActualizarTokenDispositivo(model.GuardianId, model.Token);
             return Ok(new { message = "Token de dispositivo actualizado correctamente" });
         }
+
+        // Eliminar el token de dispositivo
+        [HttpDelete("eliminarTokenDispositivo/{guardianId}")]
+        public async Task<IActionResult> EliminarTokenDispositivo(string guardianId)
+        {
+            await _firestoreService.EliminarTokenDispositivo(guardianId);
+            return Ok(new { message = "Token de dispositivo eliminado correctamente" });
+        }
     }
 
     public class LoginModel

@@ -423,9 +423,20 @@ namespace GuardianService.Services
         {
             DocumentReference docRef = _firestoreDb.Collection("Guardianes").Document(guardianId);
             await docRef.UpdateAsync(new Dictionary<string, object>
-    {
-        { "TokenDispositivo", token }
-    });
+            {
+                { "TokenDispositivo", token }
+            });
+        }
+
+        public async Task EliminarTokenDispositivo(string guardianId)
+        {
+            // Lógica para eliminar el token de dispositivo en Firebase o tu base de datos
+            var guardianDoc = _firestoreDb.Collection("Guardianes").Document(guardianId);
+            var updates = new Dictionary<string, object>
+                {
+                    { "TokenDispositivo", FieldValue.Delete }
+                };
+            await guardianDoc.UpdateAsync(updates);
         }
     }
 }
