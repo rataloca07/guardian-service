@@ -17,28 +17,43 @@ namespace GuardianService.Services
 
         public FirestoreService(IConfiguration configuration)
         {
-            /*string filePath = configuration["Firebase:FilePath"];
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filePath);
-            _firestoreDb = FirestoreDb.Create(configuration["Firebase:ProjectId"]);*/
+            // Obtener credenciales desde la variable de entorno o archivo local
             var credentialJson = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIAL");
             GoogleCredential credential;
 
             if (string.IsNullOrEmpty(credentialJson))
             {
-                credential = GoogleCredential.FromFile("Firebase/serviceAccountKey.json");
+                // Si no hay credenciales en el entorno, intenta cargar desde un archivo local (solo para desarrollo)
+                try
+                {
+                    credential = GoogleCredential.FromFile("Firebase/serviceAccountKey.json");
+                }
+                catch (FileNotFoundException ex)
+                {
+                    throw new Exception("No se encontró el archivo de credenciales y no hay credenciales en las variables de entorno. Asegúrate de que las credenciales estén correctamente configuradas.", ex);
+                }
             }
             else
             {
+                // Utiliza las credenciales de la variable de entorno en producción
                 credential = GoogleCredential.FromJson(credentialJson);
             }
 
-            // Crear el FirestoreClient utilizando FirestoreClientBuilder
+            // Verificar que el ID del proyecto de Firebase esté presente
+            var firebaseProjectId = Environment.GetEnvironmentVariable("FIREBASE_PROJECT_ID");
+            if (string.IsNullOrEmpty(firebaseProjectId))
+            {
+                throw new Exception("El ID del proyecto de Firebase no está configurado. Asegúrate de que la variable de entorno 'FIREBASE_PROJECT_ID' esté correctamente configurada.");
+            }
+
+            // Crear el FirestoreClient utilizando FirestoreClientBuilder con las credenciales
             var firestoreClient = new FirestoreClientBuilder
             {
                 ChannelCredentials = credential.ToChannelCredentials()
             }.Build();
 
-            _firestoreDb = FirestoreDb.Create(configuration["Firebase:ProjectId"], firestoreClient);
+            // Crear la instancia de FirestoreDb con el ID del proyecto
+            _firestoreDb = FirestoreDb.Create(firebaseProjectId, firestoreClient);
         }
 
         // Registrar un nuevo guardián
@@ -290,14 +305,17 @@ namespace GuardianService.Services
         {
             // Cargar credenciales desde el archivo de cuenta de servicio o variable de entorno
             GoogleCredential credential;
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS")))
+            var credentialJson = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIAL");
+
+            if (!string.IsNullOrEmpty(credentialJson))
             {
-                credential = GoogleCredential.GetApplicationDefault();
+                credential = GoogleCredential.FromJson(credentialJson)
+                    .CreateScoped("https://www.googleapis.com/auth/firebase.messaging");
             }
             else
             {
-                credential = GoogleCredential.FromFile("Firebase/serviceAccountKey.json")
-                    .CreateScoped("https://www.googleapis.com/auth/firebase.messaging");
+                // Maneja la excepción si no puedes obtener el JSON de las credenciales
+                throw new Exception("No se encontraron credenciales válidas para Firebase.");
             }
 
             // Obtener el token OAuth para autenticación
