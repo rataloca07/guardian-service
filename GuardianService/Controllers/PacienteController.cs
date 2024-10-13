@@ -80,6 +80,26 @@ namespace GuardianService.Controllers
 
             return Ok(paciente);
         }
+
+        // Método para modificar un paciente
+        [HttpPut("modificar")]
+        public async Task<IActionResult> ModificarPaciente([FromBody] Paciente paciente)
+        {
+            if (paciente == null || string.IsNullOrEmpty(paciente.Id))
+            {
+                return BadRequest(new { message = "Datos del paciente inválidos." });
+            }
+
+            // Llamamos al servicio para modificar el paciente
+            bool result = await _firestoreService.ModificarPaciente(paciente);
+
+            if (result)
+            {
+                return Ok(new { message = "Paciente modificado exitosamente." });
+            }
+
+            return StatusCode(500, new { message = "Hubo un error al modificar el paciente." });
+        }
     }
 
     public class ActualizarEstadoModel

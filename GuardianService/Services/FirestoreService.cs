@@ -97,6 +97,29 @@ namespace GuardianService.Services
             });
         }
 
+        public async Task<bool> ModificarPaciente(Paciente paciente)
+        {
+            try
+            {
+                DocumentReference pacienteDocRef = _firestoreDb.Collection("Pacientes").Document(paciente.Id);
+
+                Dictionary<string, object> updates = new Dictionary<string, object>
+            {
+                { "Nombre", paciente.Nombre },
+                { "SIM", paciente.SIM }
+                // Añade aquí cualquier campo adicional que se pueda modificar
+            };
+
+                await pacienteDocRef.UpdateAsync(updates);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al modificar paciente: {ex.Message}");
+                return false;
+            }
+        }
+
         // Obtener un paciente por su número de SIM
         public async Task<Paciente> ObtenerPacientePorSIM(string sim)
         {
