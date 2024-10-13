@@ -25,21 +25,32 @@ namespace GuardianService.Services
             var tokenHandler = new JwtSecurityTokenHandler();
 
             // Obtener el valor de la clave desde la configuración
+            //var keyString = _configuration["Jwt:Key"];
+            //            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
             var keyString = _configuration["Jwt:Key"];
 
-            if (String.IsNullOrEmpty(keyString))
+            if (string.IsNullOrEmpty(keyString))
             {
                 keyString = Environment.GetEnvironmentVariable("JWT_KEY");
             }
 
-            // Imprimir el valor de la clave obtenida de la configuración
+            // Imprimir el valor de la clave obtenida de la variable de entorno o configuración
             Console.WriteLine("Valor de Jwt:Key obtenido: " + keyString);
+
+            // Verificar si keyString sigue siendo nulo o vacío
+            if (string.IsNullOrEmpty(keyString))
+            {
+                throw new Exception("Jwt:Key es nulo o vacío.");
+            }
+
+            // Convertir la clave a bytes
+            var key = Encoding.UTF8.GetBytes(keyString);
 
             // Si tienes algún servicio de logging, podrías usarlo en lugar de Console.WriteLine
             // _logger.LogInformation("Valor de Jwt:Key obtenido: " + keyString);
 
             // Convertir la clave de Base64 a un arreglo de bytes
-            var key = Convert.FromBase64String(keyString);
+            //var key = Convert.FromBase64String(keyString);
 
             var Issuer = _configuration["Jwt:Issuer"];
             var Audience = _configuration["Jwt:Audience"];
@@ -52,10 +63,10 @@ namespace GuardianService.Services
                 Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
             }
 
-            if (String.IsNullOrEmpty(keyString))
+            /*if (String.IsNullOrEmpty(keyString))
             {
                 keyString = Environment.GetEnvironmentVariable("JWT_KEY");
-            }
+            }*/
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
