@@ -23,6 +23,26 @@ namespace GuardianService.Controllers
         [HttpPost("registrar")]
         public async Task<IActionResult> RegistrarPaciente([FromBody] Paciente paciente)
         {
+            if (paciente == null)
+            {
+                return BadRequest(new { message = "Datos del paciente vacíos" });
+            }
+
+            if (string.IsNullOrEmpty(paciente.Nombre))
+            {
+                return BadRequest(new { message = "Nombre obligatorio" });
+            }
+
+            if (string.IsNullOrEmpty(paciente.SIM))
+            {
+                return BadRequest(new { message = "Sim obligatoria" });
+            }
+
+            if (string.IsNullOrEmpty(paciente.Id))
+            {
+                return BadRequest(new { message = "No tiene guardián asociado" });
+            }
+
             await _firestoreService.RegistrarPaciente(paciente);
             return Ok(new { message = "Paciente registrado correctamente" });
         }

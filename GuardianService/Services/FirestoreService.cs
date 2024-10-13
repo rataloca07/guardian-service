@@ -88,8 +88,19 @@ namespace GuardianService.Services
         // Registrar un paciente
         public async Task RegistrarPaciente(Paciente paciente)
         {
-            DocumentReference docRef = _firestoreDb.Collection("Pacientes").Document(paciente.Id);
-            await docRef.SetAsync(paciente);
+            /*DocumentReference docRef = _firestoreDb.Collection("Pacientes").Document(paciente.Id);
+            await docRef.SetAsync(paciente);*/
+            if (string.IsNullOrEmpty(paciente.Id))
+            {
+                DocumentReference docRef = _firestoreDb.Collection("Pacientes").Document();
+                paciente.Id = docRef.Id; 
+                await docRef.SetAsync(paciente);
+            }
+            else
+            {
+                DocumentReference docRef = _firestoreDb.Collection("Pacientes").Document(paciente.Id);
+                await docRef.SetAsync(paciente);
+            }
         }
 
         // Actualizar la ubicación y el ritmo cardíaco del paciente desde el dispositivo IoT

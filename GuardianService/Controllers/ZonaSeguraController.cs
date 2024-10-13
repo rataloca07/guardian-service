@@ -34,6 +34,11 @@ namespace GuardianService.Controllers
                 return BadRequest("Datos inválidos.");
             }
 
+            if (string.IsNullOrEmpty(zonaSegura.PacienteId))
+            {
+                return BadRequest("No tiene paciente asociado");
+            }
+
             // Registrar la zona segura en Firestore
             try
             {
