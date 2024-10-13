@@ -428,7 +428,7 @@ namespace GuardianService.Services
             });
         }*/
 
-        public async Task ActualizarTokenDispositivo(string guardianId, string token)
+        /*public async Task ActualizarTokenDispositivo(string guardianId, string token)
         {
             try
             {
@@ -459,9 +459,49 @@ namespace GuardianService.Services
                 Console.WriteLine($"Error actualizando token de dispositivo: {ex.Message}");
                 throw;
             }
+        }*/
+        public async Task ActualizarTokenDispositivo(string guardianId, string token)
+        {
+            try
+            {
+                // Busca el guardián en la base de datos
+                var guardianDoc = await _firestoreDb.Collection("Guardianes").Document(guardianId).GetSnapshotAsync();
+
+                if (guardianDoc.Exists)
+                {
+                    // Verificamos si el campo 'TokenDispositivo' existe en el documento
+                    if (guardianDoc.ContainsField("TokenDispositivo"))
+                    {
+                        var tokenDispositivoActual = guardianDoc.GetValue<string>("TokenDispositivo");
+
+                        // Actualizamos el token, incluso si ya existía uno
+                        if (!string.IsNullOrEmpty(tokenDispositivoActual))
+                        {
+                            Console.WriteLine($"Token anterior: {tokenDispositivoActual}. Se actualizará al nuevo token: {token}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("El campo 'TokenDispositivo' no existe. Se agregará por primera vez.");
+                    }
+
+                    // Actualizamos o agregamos el token en Firebase
+                    await guardianDoc.Reference.UpdateAsync("TokenDispositivo", token);
+                    Console.WriteLine("Token de dispositivo actualizado correctamente en la base de datos");
+                }
+                else
+                {
+                    Console.WriteLine($"Guardían con ID {guardianId} no encontrado.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error actualizando token de dispositivo: {ex.Message}");
+                throw;
+            }
         }
 
-        public async Task EliminarTokenDispositivo(string guardianId)
+        /*public async Task EliminarTokenDispositivo(string guardianId)
         {
             // Lógica para eliminar el token de dispositivo en Firebase o tu base de datos
             var guardianDoc = _firestoreDb.Collection("Guardianes").Document(guardianId);
@@ -470,6 +510,45 @@ namespace GuardianService.Services
                     { "TokenDispositivo", FieldValue.Delete }
                 };
             await guardianDoc.UpdateAsync(updates);
+        }*/
+
+        public async Task EliminarTokenDispositivo(string guardianId)
+        {
+            try
+            {
+                // Buscar el documento del guardián
+                var guardianDoc = await _firestoreDb.Collection("Guardianes").Document(guardianId).GetSnapshotAsync();
+
+                if (guardianDoc.Exists)
+                {
+                    // Verificar si el campo 'TokenDispositivo' existe antes de intentar eliminarlo
+                    if (guardianDoc.ContainsField("TokenDispositivo"))
+                    {
+                        // Crear un diccionario de actualizaciones para eliminar el campo
+                        var updates = new Dictionary<string, object>
+                {
+                    { "TokenDispositivo", FieldValue.Delete }
+                };
+
+                        // Ejecutar la actualización para eliminar el campo
+                        await guardianDoc.Reference.UpdateAsync(updates);
+                        Console.WriteLine("Token de dispositivo eliminado correctamente.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("El campo 'TokenDispositivo' no existe en este documento, no es necesario eliminarlo.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Guardían con ID {guardianId} no encontrado.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al eliminar el token de dispositivo: {ex.Message}");
+                throw;
+            }
         }
     }
 }
