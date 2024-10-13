@@ -47,8 +47,10 @@ namespace GuardianService.Controllers
             {
                 Console.WriteLine("---------------Paciente salio de zona segura----------------");
                 var guardian = await _firestoreService.ObtenerGuardianPorId(paciente.GuardianId);
+                Console.WriteLine("---------------Intenta obtener guardian----------------");
                 if (guardian != null && !string.IsNullOrEmpty(guardian.TokenDispositivo))
                 {
+                    Console.WriteLine("---------Obtuvo guardian----------------");
                     await _firestoreService.EnviarNotificacionAlerta(
                         guardian.TokenDispositivo,
                         "Alerta: Paciente fuera de la zona segura",
