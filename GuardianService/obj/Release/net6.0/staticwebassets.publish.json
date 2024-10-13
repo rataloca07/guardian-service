@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "IQkeARECcZ3Y0LWCnTWARQ+7mp4zFsibm6b0rIHj63M=",
+  "Source": "GuardianService",
+  "BasePath": "_content/GuardianService",
+  "Mode": "Default",
+  "ManifestType": "Publish",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
