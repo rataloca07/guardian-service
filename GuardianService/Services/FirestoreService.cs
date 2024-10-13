@@ -428,7 +428,7 @@ namespace GuardianService.Services
             });
         }*/
 
-        public async Task ActualizarTokenDispositivo(string guardianId, string nuevoToken)
+        public async Task ActualizarTokenDispositivo(string guardianId, string token)
         {
             try
             {
@@ -442,11 +442,11 @@ namespace GuardianService.Services
                     // Actualizamos el token, incluso si ya existía uno
                     if (!string.IsNullOrEmpty(tokenDispositivoActual))
                     {
-                        Console.WriteLine($"Token anterior: {tokenDispositivoActual}. Se actualizará al nuevo token: {nuevoToken}");
+                        Console.WriteLine($"Token anterior: {tokenDispositivoActual}. Se actualizará al nuevo token: {token}");
                     }
 
                     // Actualizamos el token en Firebase
-                    await guardianDoc.Reference.UpdateAsync("TokenDispositivo", nuevoToken);
+                    await guardianDoc.Reference.UpdateAsync("TokenDispositivo", token);
                     Console.WriteLine("Token de dispositivo actualizado correctamente en la base de datos");
                 }
                 else
