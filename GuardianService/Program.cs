@@ -57,18 +57,18 @@ builder.Services.AddAuthentication(options =>
 // Configuración de CORS para permitir cualquier origen en desarrollo (o especificar orígenes)
 builder.Services.AddCors(options =>
 {
-    /*options.AddPolicy("AllowAllOrigins", policy =>
+    options.AddPolicy("AllowAllOrigins", policy =>
     {
         policy.AllowAnyOrigin()  // Permitir cualquier origen
               .AllowAnyHeader()  // Permitir cualquier encabezado
               .AllowAnyMethod();  // Permitir cualquier método HTTP
-    });*/
-    options.AddPolicy("AllowSpecificOrigins", policy =>
+    });
+    /*options.AddPolicy("AllowSpecificOrigins", policy =>
     {
         policy.WithOrigins("http://localhost","https://localhost", "https://guardian-service.onrender.com")  // Permitir estos dominios
               .AllowAnyHeader()
               .AllowAnyMethod();
-    });
+    });*/
 });
 
 
@@ -81,8 +81,8 @@ builder.Services.AddSwaggerGen();*/
 
 var app = builder.Build();
 
-//app.UseCors("AllowAllOrigins");
-app.UseCors("AllowSpecificOrigins");
+app.UseCors("AllowAllOrigins");
+//app.UseCors("AllowSpecificOrigins");
 
 // Configure the HTTP request pipeline.
 /*if (app.Environment.IsDevelopment())
