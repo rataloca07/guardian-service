@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using GuardianService.Services;
 using GuardianService.Models;
-
+using Newtonsoft.Json;
 
 namespace GuardianService.Controllers
 {
@@ -46,7 +46,11 @@ namespace GuardianService.Controllers
             if (estaFueraDeZonaSegura)
             {
                 Console.WriteLine("---------------Paciente salio de zona segura----------------");
+                Console.WriteLine("Paciente: ");
+                Console.WriteLine(JsonConvert.SerializeObject(paciente));
                 var guardian = await _firestoreService.ObtenerGuardianPorId(paciente.GuardianId);
+                Console.WriteLine("guardian: ");
+                Console.WriteLine(JsonConvert.SerializeObject(guardian));
                 Console.WriteLine("---------------Intenta obtener guardian----------------");
                 if (guardian != null && !string.IsNullOrEmpty(guardian.TokenDispositivo))
                 {
