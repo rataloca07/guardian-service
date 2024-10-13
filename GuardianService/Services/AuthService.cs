@@ -27,6 +27,11 @@ namespace GuardianService.Services
             // Obtener el valor de la clave desde la configuración
             var keyString = _configuration["Jwt:Key"];
 
+            if (String.IsNullOrEmpty(keyString))
+            {
+                keyString = Environment.GetEnvironmentVariable("JWT_KEY");
+            }
+
             // Imprimir el valor de la clave obtenida de la configuración
             Console.WriteLine("Valor de Jwt:Key obtenido: " + keyString);
 
@@ -36,6 +41,22 @@ namespace GuardianService.Services
             // Convertir la clave de Base64 a un arreglo de bytes
             var key = Convert.FromBase64String(keyString);
 
+            var Issuer = _configuration["Jwt:Issuer"];
+            var Audience = _configuration["Jwt:Audience"];
+            if (String.IsNullOrEmpty(Issuer))
+            {
+                Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+            }
+            if (String.IsNullOrEmpty(Audience))
+            {
+                Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+            }
+
+            if (String.IsNullOrEmpty(keyString))
+            {
+                keyString = Environment.GetEnvironmentVariable("JWT_KEY");
+            }
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
@@ -44,8 +65,8 @@ namespace GuardianService.Services
         }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:Audience"]
+                Issuer = Issuer,
+                Audience = Audience
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
