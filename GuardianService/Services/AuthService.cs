@@ -23,16 +23,24 @@ namespace GuardianService.Services
         public string GenerateToken(string guardianId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+            var key = _configuration["Jwt:Key"];
+
+            // Verificar si la clave es nula o vacía
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new ArgumentException("La clave JWT no está configurada correctamente.");
+            }
+
+            var keyBytes = Encoding.UTF8.GetBytes(key);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, guardianId)
-                }),
+            new Claim(ClaimTypes.NameIdentifier, guardianId)
+        }),
                 Expires = DateTime.UtcNow.AddHours(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256Signature),
                 Issuer = _configuration["Jwt:Issuer"],
                 Audience = _configuration["Jwt:Audience"]
             };
