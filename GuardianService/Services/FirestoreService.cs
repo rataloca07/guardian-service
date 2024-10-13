@@ -17,43 +17,26 @@ namespace GuardianService.Services
 
         public FirestoreService(IConfiguration configuration)
         {
-            // Obtener credenciales desde la variable de entorno o archivo local
             var credentialJson = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIAL");
             GoogleCredential credential;
 
             if (string.IsNullOrEmpty(credentialJson))
             {
-                // Si no hay credenciales en el entorno, intenta cargar desde un archivo local (solo para desarrollo)
-                try
-                {
-                    credential = GoogleCredential.FromFile("Firebase/serviceAccountKey.json");
-                }
-                catch (FileNotFoundException ex)
-                {
-                    throw new Exception("No se encontró el archivo de credenciales y no hay credenciales en las variables de entorno. Asegúrate de que las credenciales estén correctamente configuradas.", ex);
-                }
+                // Fallback para desarrollo local
+                credential = GoogleCredential.FromFile("Firebase/serviceAccountKey.json");
             }
             else
             {
-                // Utiliza las credenciales de la variable de entorno en producción
                 credential = GoogleCredential.FromJson(credentialJson);
             }
 
-            // Verificar que el ID del proyecto de Firebase esté presente
-            var firebaseProjectId = Environment.GetEnvironmentVariable("FIREBASE_PROJECT_ID");
-            if (string.IsNullOrEmpty(firebaseProjectId))
-            {
-                throw new Exception("El ID del proyecto de Firebase no está configurado. Asegúrate de que la variable de entorno 'FIREBASE_PROJECT_ID' esté correctamente configurada.");
-            }
-
-            // Crear el FirestoreClient utilizando FirestoreClientBuilder con las credenciales
+            // Crear el FirestoreClient utilizando FirestoreClientBuilder
             var firestoreClient = new FirestoreClientBuilder
             {
                 ChannelCredentials = credential.ToChannelCredentials()
             }.Build();
 
-            // Crear la instancia de FirestoreDb con el ID del proyecto
-            _firestoreDb = FirestoreDb.Create(firebaseProjectId, firestoreClient);
+            _firestoreDb = FirestoreDb.Create(Environment.GetEnvironmentVariable("FIREBASE_PROJECT_ID"), firestoreClient);
         }
 
         // Registrar un nuevo guardián
