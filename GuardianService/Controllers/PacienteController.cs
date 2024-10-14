@@ -121,6 +121,40 @@ namespace GuardianService.Controllers
             return Ok(new { message = "Paciente dentro de la zona segura, sin alerta." });
         }
 
+        [HttpPost("actualizarIoT")]
+        [AllowAnonymous]  // Este método es accesible sin autenticación
+        public async Task<IActionResult> ActualizarEstadoPacienteIoT([FromBody] ActualizarEstadoModel model)
+        {
+            // Verificar si el número SIM asociado al paciente existe
+            var paciente = await _firestoreService.ObtenerPacientePorSIM(model.SIM);
+            if (paciente == null)
+                return NotFound(new { message = "Paciente no encontrado" });
+
+            // Actualizar la ubicación y el ritmo cardíaco del paciente
+            await _firestoreService.ActualizarEstadoPaciente(model.SIM, model.Latitud, model.Longitud, model.RitmoCardiaco);
+
+            // Verificar si el paciente está fuera de la zona segura
+            var estaFueraDeZonaSegura = await _firestoreService.PacienteFueraDeZonaSegura(paciente.Id, model.Latitud, model.Longitud);
+
+            // Si está fuera de la zona segura, enviamos la notificación al guardián
+            if (estaFueraDeZonaSegura)
+            {
+                var guardian = await _firestoreService.ObtenerGuardianPorId(paciente.GuardianId);
+                if (guardian != null && !string.IsNullOrEmpty(guardian.TokenDispositivo))
+                {
+                    await _firestoreService.EnviarNotificacionAlerta(
+                        guardian.TokenDispositivo,
+                        "Alerta: Paciente fuera de la zona segura",
+                        $"El paciente asociado al guardián {guardian.Nombre} ha salido de la zona segura."
+                    );
+                }
+
+                return Ok(new { message = "Paciente fuera de la zona segura, alerta enviada" });
+            }
+
+            return Ok(new { message = "Paciente dentro de la zona segura, sin alerta." });
+        }
+
 
         [HttpGet("obtener/{pacienteId}")]
         public async Task<IActionResult> ObtenerPaciente(string pacienteId)

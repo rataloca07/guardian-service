@@ -255,7 +255,7 @@ namespace GuardianService.Services
         }
 
         // Verificar si un paciente está fuera de la zona segura
-        public async Task<bool> PacienteFueraDeZonaSegura(string pacienteId, double latitudPaciente, double longitudPaciente)
+        /*public async Task<bool> PacienteFueraDeZonaSegura(string pacienteId, double latitudPaciente, double longitudPaciente)
         {
             var zonas = await ObtenerZonasSegurasPorPaciente(pacienteId);
             foreach (var zona in zonas)
@@ -266,6 +266,30 @@ namespace GuardianService.Services
                     return false; // Paciente está dentro de la zona segura
                 }
             }
+            return true; // Paciente está fuera de todas las zonas seguras
+        }*/
+        public async Task<bool> PacienteFueraDeZonaSegura(string pacienteId, double latitudPaciente, double longitudPaciente)
+        {
+            var zonas = await ObtenerZonasSegurasPorPaciente(pacienteId);
+
+            // Verificar si no hay zonas registradas para este paciente
+            if (zonas == null || zonas.Count == 0)
+            {
+                // Si no hay zonas seguras registradas, podemos decidir que el paciente está "fuera de zona segura"
+                return true; // Paciente fuera de zona segura por no haber zonas definidas
+            }
+
+            // Si hay zonas seguras, calcular la distancia del paciente a cada zona
+            foreach (var zona in zonas)
+            {
+                double distancia = CalcularDistancia(latitudPaciente, longitudPaciente, zona.LatitudCentro, zona.LongitudCentro);
+                if (distancia <= zona.Radio)
+                {
+                    return false; // Paciente está dentro de la zona segura
+                }
+            }
+
+            // Si no está dentro de ninguna zona segura
             return true; // Paciente está fuera de todas las zonas seguras
         }
 
