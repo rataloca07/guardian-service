@@ -462,8 +462,7 @@ namespace GuardianService.Services
                     notification = new
                     {
                         title = titulo,
-                        body = mensaje,
-                        sound = "default"
+                        body = mensaje
                     }
                 }
             };
