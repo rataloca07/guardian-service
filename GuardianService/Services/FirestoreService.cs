@@ -447,6 +447,11 @@ namespace GuardianService.Services
                 throw new Exception("No se encontraron credenciales válidas para Firebase.");
             }
 
+            // Codifica los títulos y mensajes para asegurarte de que están en el formato correcto
+            titulo = System.Net.WebUtility.HtmlEncode(titulo);
+            mensaje = System.Net.WebUtility.HtmlEncode(mensaje);
+
+
             var accessToken = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
 
             var message = new
