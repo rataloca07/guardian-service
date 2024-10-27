@@ -136,11 +136,16 @@ namespace GuardianService.Controllers
         [AllowAnonymous]  // Este método es accesible sin autenticación
         public async Task<IActionResult> ActualizarEstadoPacienteIoT([FromBody] ActualizarEstadoModel model)
         {
+            Console.WriteLine("---------------ActualizarEstadoPacienteIoT----------------");
             // Verificar si el número SIM asociado al paciente existe
             var paciente = await _firestoreService.ObtenerPacientePorSIM(model.SIM);
+            Console.WriteLine("------Busca paciente por SIM---");
             if (paciente == null)
+            {
+                Console.WriteLine("------No encontró paciente---");
                 return NotFound(new { message = "Paciente no encontrado" });
-
+            }
+            Console.WriteLine("------Encontró paciente---");
             //Verificar si está en zona segura en sus coordenadas anteriores para no repetir notificación
             var coordOldFueraDeZonaSegura = await _firestoreService.PacienteFueraDeZonaSegura(paciente.Id, paciente.Latitud, paciente.Longitud);
 
@@ -149,6 +154,7 @@ namespace GuardianService.Controllers
             // Si está fuera de la zona segura, enviamos la notificación al guardián
             if (coordOldFueraDeZonaSegura)
             {
+                Console.WriteLine("------Coordenada anterior fuera de zona segura---");
                 return Ok(new { message = "Paciente sigue fuera de zona segura. No repetir notificación" });
             }
 
@@ -158,6 +164,7 @@ namespace GuardianService.Controllers
             // Si está fuera de la zona segura, enviamos la notificación al guardián
             if (estaFueraDeZonaSegura)
             {
+                Console.WriteLine("------Ubicación actual fuera de zona segura---");
                 var guardian = await _firestoreService.ObtenerGuardianPorId(paciente.GuardianId);
                 if (guardian != null && !string.IsNullOrEmpty(guardian.TokenDispositivo))
                 {
@@ -170,6 +177,7 @@ namespace GuardianService.Controllers
 
                 return Ok(new { message = "Paciente fuera de la zona segura, alerta enviada" });
             }
+            Console.WriteLine("------Ubicación actual dentro de zona segura---");
 
             return Ok(new { message = "Paciente dentro de la zona segura, sin alerta." });
         }
