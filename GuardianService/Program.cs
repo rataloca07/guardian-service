@@ -82,7 +82,21 @@ builder.Services.AddSwaggerGen();*/
 var app = builder.Build();
 
 
+
 app.UseCors("AllowAllOrigins");
+
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next.Invoke();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error: {ex.Message}");  // Log de errores
+        throw;
+    }
+});
 
 /*app.Use(async (context, next) =>
 {
