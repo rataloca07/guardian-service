@@ -147,7 +147,8 @@ namespace GuardianService.Controllers
                 Console.WriteLine("------No encontró paciente---");
                 return NotFound(new { message = "Paciente no encontrado" });
             }
-            Console.WriteLine("------Encontró paciente---");
+            Console.WriteLine("------Encontró paciente. Paciente Obtenido:---");
+            Console.WriteLine(JsonConvert.SerializeObject(paciente));
             //Verificar si está en zona segura en sus coordenadas anteriores para no repetir notificación
             var coordOldFueraDeZonaSegura = await _firestoreService.PacienteFueraDeZonaSegura(paciente.Id, paciente.Latitud, paciente.Longitud);
 
