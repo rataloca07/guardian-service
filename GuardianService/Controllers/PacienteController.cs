@@ -82,6 +82,16 @@ namespace GuardianService.Controllers
         public async Task<IActionResult> ActualizarEstadoPaciente([FromBody] ActualizarEstadoModel model)
         {
 
+            if (model == null)
+            {
+                return BadRequest("Los datos del paciente están vacíos");
+            }
+
+            if (String.IsNullOrEmpty(model.SIM))
+            {
+                return BadRequest("El IMEI del paciente está vacío");
+            }
+
             // Recuperamos al paciente usando el número de SIM
             var paciente = await _firestoreService.ObtenerPacientePorSIM(model.SIM);
             if (paciente == null)
@@ -140,6 +150,16 @@ namespace GuardianService.Controllers
             Console.WriteLine("-------Parámetros recibidos:------------");
             Console.WriteLine(JsonConvert.SerializeObject(model));
             // Verificar si el número SIM asociado al paciente existe
+            if(model == null)
+            {
+                return BadRequest("Los datos del paciente están vacíos");
+            }
+
+            if (String.IsNullOrEmpty(model.SIM))
+            {
+                return BadRequest("El IMEI del paciente está vacío");
+            }
+
             var paciente = await _firestoreService.ObtenerPacientePorSIM(model.SIM);
             Console.WriteLine("------Busca paciente por SIM---");
             if (paciente == null)
