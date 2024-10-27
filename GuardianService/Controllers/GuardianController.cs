@@ -29,16 +29,31 @@ namespace GuardianService.Controllers
                 return BadRequest(new { message = "Todos los campos son obligatorios." });
             }
 
+            guardian.Email = guardian.Email.Trim().ToLower();
+
+            var guardianExiste = await _firestoreService.ObtenerGuardianPorEmail(guardian.Email);
+            if (guardianExiste != null)
+            {
+                return BadRequest(new { message = "El correo ya se encuentra registrado. " });
+            }
+
             // Cifrar la contraseña antes de guardar
             guardian.Password = BCrypt.Net.BCrypt.HashPassword(guardian.Password);
             await _firestoreService.RegistrarGuardian(guardian);
-            return Ok(new { message = "Guardían registrado correctamente" });
+            return Ok(new { message = "Guardián registrado correctamente" });
         }
 
         // Iniciar sesión y generar JWT
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
+            if (model == null || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
+            {
+                return BadRequest(new { message = "Todos los campos son obligatorios." });
+            }
+
+            model.Email = model.Email.Trim().ToLower();
+
             var guardian = await _firestoreService.ObtenerGuardianPorEmail(model.Email);
             if (guardian == null || !BCrypt.Net.BCrypt.Verify(model.Password, guardian.Password))
                 return Unauthorized(new { message = "Credenciales incorrectas" });

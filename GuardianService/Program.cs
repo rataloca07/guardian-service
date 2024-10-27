@@ -81,7 +81,16 @@ builder.Services.AddSwaggerGen();*/
 
 var app = builder.Build();
 
+
 app.UseCors("AllowAllOrigins");
+
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
+    await next.Invoke();
+    Console.WriteLine($"Response: {context.Response.StatusCode}");
+});
+
 //app.UseCors("AllowSpecificOrigins");
 
 // Configure the HTTP request pipeline.

@@ -81,13 +81,24 @@ namespace GuardianService.Controllers
         [HttpPost("actualizar")]
         public async Task<IActionResult> ActualizarEstadoPaciente([FromBody] ActualizarEstadoModel model)
         {
-            // Actualizamos el estado del paciente (latitud, longitud, ritmo cardíaco)
-            await _firestoreService.ActualizarEstadoPaciente(model.SIM, model.Latitud, model.Longitud, model.RitmoCardiaco);
 
             // Recuperamos al paciente usando el número de SIM
             var paciente = await _firestoreService.ObtenerPacientePorSIM(model.SIM);
             if (paciente == null)
                 return NotFound(new { message = "Paciente no encontrado" });
+
+
+            //Verificar si está en zona segura en sus coordenadas anteriores para no repetir notificación
+            var coordOldFueraDeZonaSegura = await _firestoreService.PacienteFueraDeZonaSegura(paciente.Id, paciente.Latitud, paciente.Longitud);
+
+            // Actualizamos el estado del paciente (latitud, longitud, ritmo cardíaco)
+            await _firestoreService.ActualizarEstadoPaciente(model.SIM, model.Latitud, model.Longitud, model.RitmoCardiaco);
+
+            // Si está fuera de la zona segura, enviamos la notificación al guardián
+            if (coordOldFueraDeZonaSegura)
+            {
+                return Ok(new { message = "Paciente sigue fuera de zona segura. No repetir notificación" });
+            }
 
             // Verificamos si el paciente está fuera de la zona segura
             var estaFueraDeZonaSegura = await _firestoreService.PacienteFueraDeZonaSegura(paciente.Id, model.Latitud, model.Longitud);
@@ -130,8 +141,16 @@ namespace GuardianService.Controllers
             if (paciente == null)
                 return NotFound(new { message = "Paciente no encontrado" });
 
+            //Verificar si está en zona segura en sus coordenadas anteriores para no repetir notificación
+            var coordOldFueraDeZonaSegura = await _firestoreService.PacienteFueraDeZonaSegura(paciente.Id, paciente.Latitud, paciente.Longitud);
+
             // Actualizar la ubicación y el ritmo cardíaco del paciente
             await _firestoreService.ActualizarEstadoPaciente(model.SIM, model.Latitud, model.Longitud, model.RitmoCardiaco);
+            // Si está fuera de la zona segura, enviamos la notificación al guardián
+            if (coordOldFueraDeZonaSegura)
+            {
+                return Ok(new { message = "Paciente sigue fuera de zona segura. No repetir notificación" });
+            }
 
             // Verificar si el paciente está fuera de la zona segura
             var estaFueraDeZonaSegura = await _firestoreService.PacienteFueraDeZonaSegura(paciente.Id, model.Latitud, model.Longitud);
