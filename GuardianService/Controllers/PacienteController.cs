@@ -137,6 +137,8 @@ namespace GuardianService.Controllers
         public async Task<IActionResult> ActualizarEstadoPacienteIoT([FromBody] ActualizarEstadoModel model)
         {
             Console.WriteLine("---------------ActualizarEstadoPacienteIoT----------------");
+            Console.WriteLine("-------Parámetros recibidos:------------");
+            Console.WriteLine(JsonConvert.SerializeObject(model));
             // Verificar si el número SIM asociado al paciente existe
             var paciente = await _firestoreService.ObtenerPacientePorSIM(model.SIM);
             Console.WriteLine("------Busca paciente por SIM---");
@@ -150,6 +152,8 @@ namespace GuardianService.Controllers
             var coordOldFueraDeZonaSegura = await _firestoreService.PacienteFueraDeZonaSegura(paciente.Id, paciente.Latitud, paciente.Longitud);
 
             // Actualizar la ubicación y el ritmo cardíaco del paciente
+            Console.WriteLine("-------Datos a actualizar:------------");
+            Console.WriteLine(JsonConvert.SerializeObject(model));
             await _firestoreService.ActualizarEstadoPaciente(model.SIM, model.Latitud, model.Longitud, model.RitmoCardiaco);
             // Si está fuera de la zona segura, enviamos la notificación al guardián
             if (coordOldFueraDeZonaSegura)
