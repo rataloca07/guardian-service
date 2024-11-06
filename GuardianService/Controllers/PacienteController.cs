@@ -187,7 +187,7 @@ namespace GuardianService.Controllers
                 if (coordOldFueraDeZonaSegura)
                 {
                     Console.WriteLine("------Coordenada anterior fuera de zona segura---");
-                    return Ok(new { message = "Paciente sigue fuera de zona segura. No repetir notificación" });
+                    return Ok(new { message = "Paciente sigue fuera de zona segura. No repetir notificaci\u00F3n" });
                 }
 
                 Console.WriteLine("------Ubicación actual fuera de zona segura---");
@@ -197,7 +197,7 @@ namespace GuardianService.Controllers
                     await _firestoreService.EnviarNotificacionAlerta(
                         guardian.TokenDispositivo,
                         "Alerta: Paciente fuera de la zona segura",
-                        $"El paciente asociado al guardián {guardian.Nombre} ha salido de la zona segura."
+                        $"El paciente asociado al guardi\u00E1n {guardian.Nombre} ha salido de la zona segura."
                     );
                 }
 
