@@ -176,12 +176,7 @@ namespace GuardianService.Controllers
             Console.WriteLine("-------Datos a actualizar:------------");
             Console.WriteLine(JsonConvert.SerializeObject(model));
             await _firestoreService.ActualizarEstadoPaciente(model.SIM, model.Latitud, model.Longitud, model.RitmoCardiaco);
-            // Si está fuera de la zona segura, enviamos la notificación al guardián
-            /*if (coordOldFueraDeZonaSegura)
-            {
-                Console.WriteLine("------Coordenada anterior fuera de zona segura---");
-                return Ok(new { message = "Paciente sigue fuera de zona segura. No repetir notificación" });
-            }*/
+
 
             // Verificar si el paciente está fuera de la zona segura
             var estaFueraDeZonaSegura = await _firestoreService.PacienteFueraDeZonaSegura(paciente.Id, model.Latitud, model.Longitud);
