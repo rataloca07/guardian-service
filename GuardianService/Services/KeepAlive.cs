@@ -48,7 +48,7 @@ namespace GuardianService.Services
             _logger.LogInformation("Ejecutando tarea para mantener el servicio despierto.");
 
             // Ejemplo: Hacer una solicitud HTTP hacia tu propio endpoint
-            try
+            /*try
             {
                 using var client = new HttpClient();
                 var response = await client.GetAsync("http://guardian-service.onrender.com/api/paciente/obtener/"+"-1");
@@ -64,7 +64,7 @@ namespace GuardianService.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al realizar el ping.");
-            }
+            }*/
         }
     }
 }
