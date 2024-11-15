@@ -16,6 +16,8 @@ builder.Services.AddControllers();
 // Firestore Service
 builder.Services.AddScoped<FirestoreService>();
 
+builder.Services.AddHostedService<KeepAliveService>();
+
 
 // Registrar IAuthService y su implementación
 builder.Services.AddScoped<IAuthService, AuthService>();

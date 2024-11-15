@@ -186,7 +186,7 @@ namespace GuardianService.Controllers
             {
                 if (coordOldFueraDeZonaSegura)
                 {
-                    Console.WriteLine("------Coordenada anterior fuera de zona segura---");
+                    Console.WriteLine("------Coordenada anterior y actual fuera de zona segura---");
                     return Ok(new { message = "Paciente sigue fuera de zona segura. No repetir notificaci\u00F3n" });
                 }
 
